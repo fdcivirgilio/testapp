@@ -77,6 +77,20 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        //Incomplete profile dialog
+
+        var title = "Incomplete Profile"
+        var message = "Hi, we noticed that you didn't finish your profile. Let us help you!"
+        DialogUtils.showCustomDialog(
+            this@MainActivity,
+            title,
+            message,
+            {
+                val intent = Intent(this@MainActivity, LoginActivity::class.java)
+                startActivity(intent)
+            }
+        )
+
         binding.goToLoginBtn.setOnClickListener {
             if(SessionManager.token == null){
                 var intent  = Intent(this, LoginActivity::class.java    )
