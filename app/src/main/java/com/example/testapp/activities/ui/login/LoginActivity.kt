@@ -1,6 +1,7 @@
 package com.example.testapp.activities.ui.login
 
 import android.app.Activity
+import android.content.Context
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
@@ -8,23 +9,31 @@ import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.testapp.databinding.ActivityLoginBinding
 
 import com.example.testapp.R
+import com.example.testapp.activities.MainActivity
+import com.example.testapp.activities.data.AppDatabase
+import com.example.testapp.activities.data.DatabaseProvider
 import com.example.testapp.utils.SessionManager
+import com.example.testapp.activities.data.User
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var loginViewModel: LoginViewModel
     private lateinit var binding: ActivityLoginBinding
+    private lateinit var db: AppDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        db = DatabaseProvider.getDatabase(this)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -32,7 +41,6 @@ class LoginActivity : AppCompatActivity() {
         val password = binding.password
         val login = binding.login
         val loading = binding.loading
-
         loginViewModel = ViewModelProvider(this, LoginViewModelFactory())
             .get(LoginViewModel::class.java)
 
@@ -59,6 +67,22 @@ class LoginActivity : AppCompatActivity() {
             if (loginResult.success != null) {
                 val generatedToken = java.util.UUID.randomUUID().toString()
                 SessionManager.token = generatedToken
+                lifecycleScope.launch {
+                    val userDao = db.userDao()
+                    try {
+                        var user = userDao.getUserByEmail(email = username.text.toString())
+                        if(user != null){
+                            Log.d("RoomExample", "Email Address is ${user.email_address}")
+                            userDao.updateTokenByEmail(email = user.email_address, newToken = SessionManager.token.toString())
+                        }
+
+                    } catch (e: Exception) {
+                        Log.d("RoomExample", "Failed to add user:")
+
+                        e.printStackTrace()
+                    }
+                    Log.d("RoomExample", "Users: ${userDao.getAllUsers()}")
+                }
                 updateUiWithUser(loginResult.success)
             }
             setResult(Activity.RESULT_OK)
