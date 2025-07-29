@@ -1,13 +1,23 @@
 package com.example.testapp.adaptors
 
+import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.TextView
 import com.example.testapp.activities.data.MyItem
 import androidx.recyclerview.widget.RecyclerView
 import android.view.View
+import androidx.core.content.ContextCompat.startActivity
 import com.example.testapp.R
-class MyAdapter(private val itemList: List<MyItem>) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
+import com.example.testapp.activities.UserDetailsActivity
+import com.google.gson.Gson
+import com.example.testapp.activities.data.User
+
+class MyAdapter(
+    private val itemList: List<MyItem>,
+    private val context: Context,
+) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val textViewItem: TextView = itemView.findViewById(R.id.textViewItem)
@@ -20,7 +30,15 @@ class MyAdapter(private val itemList: List<MyItem>) : RecyclerView.Adapter<MyAda
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val item = itemList[position]
-        holder.textViewItem.text = item.name
+        val gson = Gson()
+        val userString = item.name
+        val user = gson.fromJson(userString, User::class.java)
+        holder.textViewItem.text = user.name
+        holder.textViewItem.setOnClickListener {
+            var intent = Intent(context, UserDetailsActivity::class.java)
+            context.startActivity(intent)
+        }
+
     }
 
     override fun getItemCount(): Int = itemList.size

@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.testapp.R
 import com.example.testapp.activities.data.AppDatabase
 import com.example.testapp.activities.data.MyItem
+import com.example.testapp.activities.data.User
 import com.example.testapp.adaptors.MyAdapter
+import com.google.gson.Gson
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -64,11 +66,25 @@ class MyRecyclerViewFragment : Fragment() {
                 val email = emailMatch?.groupValues?.get(1)?.trim() ?: ""
                 val userId = userIdMatch?.groupValues?.get(1)?.trim() ?: ""
                 val display = if (name.isNotEmpty()) name else email
-                items.add(MyItem(display))
+                val gson = Gson()
+                val stringUser = gson.toJson(
+                    User(
+                        id = userId.toInt(),
+                        name = display,
+                        age = 0,
+                        token = "",
+                        email_address = email,
+                        password = ""
+                    )
+                )
+                items.add(MyItem(stringUser))
             }
         }
 
-        adapter = MyAdapter(items)
+        adapter = MyAdapter(
+            items,
+            context = requireContext()
+        )
         recyclerView.adapter = adapter
 
         return view
