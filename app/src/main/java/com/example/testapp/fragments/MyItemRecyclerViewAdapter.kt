@@ -14,6 +14,7 @@ import com.example.testapp.fragments.placeholder.PlaceholderContent.PlaceholderI
 import com.example.testapp.databinding.FragmentMenuItemBinding
 import android.util.Log
 import androidx.lifecycle.lifecycleScope
+import com.example.testapp.activities.UsersActivity
 import com.example.testapp.activities.data.AppDatabase
 import com.example.testapp.activities.data.DatabaseProvider
 import com.example.testapp.activities.data.User
@@ -49,10 +50,13 @@ class MyItemRecyclerViewAdapter(
 
             if(holder.contentView.text.toString() == "Profile"){
                 val intent = Intent(context, ProfileActivity::class.java)
-                intent.putExtra("user_id", user.id)
+                intent.putExtra("user_id", user.id.toString())
                 intent.putExtra("name", user.name)
                 intent.putExtra("age", user.age.toString())
                 intent.putExtra("email_address", user.email_address)
+                context.startActivity(intent)
+            } else if(holder.contentView.text.toString() == "Users"){
+                val intent = Intent(context, UsersActivity::class.java)
                 context.startActivity(intent)
 
             }

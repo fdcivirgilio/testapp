@@ -1,15 +1,12 @@
 package com.example.testapp.activities.utils
 
+import android.app.Activity
 import android.content.Context
 import android.widget.TextView
 import com.example.testapp.R
 import android.app.Dialog
-import android.content.Intent
 import android.view.ViewGroup
 import android.widget.Button
-import androidx.appcompat.widget.DialogTitle
-import androidx.core.content.ContextCompat.startActivity
-import com.example.testapp.activities.ui.login.LoginActivity
 
 object DialogUtils {
 
@@ -35,5 +32,13 @@ object DialogUtils {
         }
 
         dialog.show()
+
+        dialog.setCanceledOnTouchOutside(true)
+
+        dialog.setOnCancelListener {
+            if (context is Activity) {
+                context.finish()
+            }
+        }
     }
 }

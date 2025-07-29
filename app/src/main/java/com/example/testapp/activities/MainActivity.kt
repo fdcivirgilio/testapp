@@ -58,11 +58,6 @@ class MainActivity : AppCompatActivity() {
         db = DatabaseProvider.getDatabase(this)
         val userDao = db.userDao()
 
-        // Example with coroutine
-        lifecycleScope.launch {
-            val users = userDao.getAllUsers()
-            Log.d("RoomExample", "Users: $users")
-        }
         // show the login button
 
         if(SessionManager.token == null){

@@ -1,6 +1,7 @@
 package com.example.testapp.activities
 
 import android.app.Activity
+import android.app.FragmentManager
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -18,8 +19,12 @@ import com.example.testapp.activities.MainActivity
 import com.example.testapp.activities.data.AppDatabase
 import com.example.testapp.activities.data.DatabaseProvider
 import com.example.testapp.activities.data.User
+import com.example.testapp.activities.ui.login.LoginActivity
+import com.example.testapp.activities.utils.DialogUtils
 import com.example.testapp.databinding.ActivityMainBinding
 import com.example.testapp.databinding.ActivityProfileBinding
+import com.example.testapp.fragments.ToolbarFragment
+import com.example.testapp.utils.SessionManager
 import kotlinx.coroutines.launch
 
 class ProfileActivity : AppCompatActivity() {
@@ -31,6 +36,13 @@ class ProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_profile)
+        // show toolbar
+
+        var toolbarFragment = ToolbarFragment()
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.toolbar, toolbarFragment)
+            .commit()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -62,7 +74,6 @@ class ProfileActivity : AppCompatActivity() {
                 email_address = emailAddressEt.text.toString(),
                 password = ""
             )
-            Log.d("ProfileActivity", "user2: ${user2} user id: $userId")
 
             lifecycleScope.launch {
                 val rowsUpdated = db.userDao().updateUserDetails(
@@ -73,16 +84,22 @@ class ProfileActivity : AppCompatActivity() {
                 )
 
                 if (rowsUpdated > 0) {
-                    Toast.makeText(this@ProfileActivity, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
-                    val intent = Intent(this@ProfileActivity, ProfileActivity::class.java)
+                    var title = "Success!"
+                    var message = "Profile is updated."
+                    DialogUtils.showCustomDialog(
+                        this@ProfileActivity,
+                        title,
+                        message,
+                        {
+                            finish()
+                        }
+                    )
                     setResult(RESULT_OK)
-                    finish()
                 } else {
                     Toast.makeText(this@ProfileActivity, "Update failed or no changes made.", Toast.LENGTH_SHORT).show()
                 }
 
             }
         }
-
     }
 }
