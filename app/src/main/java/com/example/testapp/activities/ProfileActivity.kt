@@ -7,7 +7,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.testapp.R
+import com.example.testapp.activities.UserDetailsActivity
 import com.example.testapp.activities.data.AppDatabase
 import com.example.testapp.activities.data.DatabaseProvider
 import com.example.testapp.activities.data.User
@@ -27,6 +29,7 @@ class ProfileActivity : AppCompatActivity() {
         enableEdgeToEdge()
         binding = ActivityProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
         // show toolbar
 
         var toolbarFragment = ToolbarFragment()
@@ -40,7 +43,12 @@ class ProfileActivity : AppCompatActivity() {
             insets
         }
 
+        val imageUrl = "https://images.pexels.com/photos/31559069/pexels-photo-31559069.jpeg"
 
+        Glide.with(this)
+            .load(imageUrl)
+            .circleCrop()
+            .into(binding.profileImageIv)
 
         var emailAddressEt = binding.emailAddressEt
         var ageEt = binding.ageEt
@@ -99,6 +107,10 @@ class ProfileActivity : AppCompatActivity() {
                 }
 
             }
+        }
+
+        binding.profileImageIv.setOnClickListener {
+            DialogUtils.showCustomDialogProfileOptions(this)
         }
     }
 }
