@@ -30,15 +30,12 @@ class MyAdapter(
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val item = itemList[position]
-        val gson = Gson()
-        val userString = item.name
-        val user = gson.fromJson(userString, User::class.java)
-        holder.textViewItem.text = user.name
+        holder.textViewItem.text = item.user.name
         holder.textViewItem.setOnClickListener {
             var intent = Intent(context, UserDetailsActivity::class.java)
+            intent.putExtra("user_id", item.user.id)
             context.startActivity(intent)
         }
-
     }
 
     override fun getItemCount(): Int = itemList.size

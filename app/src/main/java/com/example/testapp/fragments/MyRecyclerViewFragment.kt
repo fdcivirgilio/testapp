@@ -66,18 +66,16 @@ class MyRecyclerViewFragment : Fragment() {
                 val email = emailMatch?.groupValues?.get(1)?.trim() ?: ""
                 val userId = userIdMatch?.groupValues?.get(1)?.trim() ?: ""
                 val display = if (name.isNotEmpty()) name else email
-                val gson = Gson()
-                val stringUser = gson.toJson(
-                    User(
-                        id = userId.toInt(),
-                        name = display,
-                        age = 0,
-                        token = "",
-                        email_address = email,
-                        password = ""
-                    )
+
+                var user = User(
+                    id = userId.toInt(),
+                    name = display,
+                    age = 0,
+                    token = "",
+                    email_address = email,
+                    password = ""
                 )
-                items.add(MyItem(stringUser))
+                items.add(MyItem(user))
             }
         }
 
