@@ -14,6 +14,10 @@ import com.example.testapp.activities.data.User
 import com.example.testapp.fragments.placeholder.PlaceholderContent
 import com.example.testapp.utils.SessionManager
 import android.util.Log
+import androidx.lifecycle.lifecycleScope
+import com.example.testapp.activities.data.AppDatabase
+import com.example.testapp.activities.data.DatabaseProvider
+import kotlinx.coroutines.launch
 
 
 /**
@@ -22,27 +26,14 @@ import android.util.Log
 class MenuItemFragment : Fragment() {
 
     private var columnCount = 1
-    lateinit var user: User
+    private lateinit var user: User
+    private lateinit var db: AppDatabase
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
-        }
-
-        arguments?.let { bundle ->
-
-            user = User(
-                id = bundle.getString("user_id").toString().toInt(),
-                name = bundle.getString("name").toString(),
-                age = bundle.getString("age").toString().toInt(),
-                token = bundle.getString("token").toString(),
-                email_address = bundle.getString("email_address").toString(),
-                password = bundle.getString("password").toString()
-            )
-
-            Log.d("MenuItemFragment", "User: $user")
-            Log.d("MenuItemFragment", "User - Non-class: ${bundle.getString("user_id").toString()}")
         }
     }
 
@@ -59,7 +50,25 @@ class MenuItemFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = MyItemRecyclerViewAdapter(PlaceholderContent.ITEMS, requireContext(), user)
+
+                arguments?.let { bundle ->
+                    lifecycleScope.launch {
+                        db = DatabaseProvider.getDatabase(requireContext())
+                        val userDao = db.userDao()
+                        val userDb = userDao.getUserByToken(SessionManager.token.toString())
+                        user = User(
+                            id = userDb?.id ?: 0,
+                            name = userDb?.name ?: "",
+                            age = userDb?.age ?: 0,
+                            token = userDb?.token ?: "",
+                            email_address = userDb?.email_address ?: "",
+                            password = userDb?.password ?: ""
+                        )
+
+                        adapter = MyItemRecyclerViewAdapter(PlaceholderContent.ITEMS, requireContext(), user)
+
+                    }
+                }
             }
         }
         return view

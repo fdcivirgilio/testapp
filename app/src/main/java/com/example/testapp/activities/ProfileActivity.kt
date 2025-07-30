@@ -14,12 +14,13 @@ import com.example.testapp.activities.data.User
 import com.example.testapp.activities.utils.DialogUtils
 import com.example.testapp.databinding.ActivityProfileBinding
 import com.example.testapp.fragments.ToolbarFragment
+import com.example.testapp.utils.SessionManager
 import kotlinx.coroutines.launch
 
 class ProfileActivity : AppCompatActivity() {
     private lateinit var binding: ActivityProfileBinding  // Binding declaration
     private lateinit var db: AppDatabase
-
+    private lateinit var user: User
     override fun onCreate(savedInstanceState: Bundle?) {
         db = DatabaseProvider.getDatabase(this)
         super.onCreate(savedInstanceState)
@@ -39,14 +40,28 @@ class ProfileActivity : AppCompatActivity() {
             insets
         }
 
+
+
         var emailAddressEt = binding.emailAddressEt
         var ageEt = binding.ageEt
         var nameEt = binding.nameEt
         var userId = intent.getStringExtra("user_id")
 
-        nameEt.setText(intent.getStringExtra("name"))
-        ageEt.setText(intent.getStringExtra("age"))
-        emailAddressEt.setText(intent.getStringExtra("email_address"))
+        lifecycleScope.launch{
+            val userDb = db.userDao().getUserByToken(SessionManager.token.toString())
+            user = User(
+                id = userDb?.id ?: 0,
+                name = userDb?.name ?: "",
+                age = userDb?.age ?: 0,
+                token = userDb?.token ?: "",
+                email_address = userDb?.email_address ?: "",
+                password = userDb?.password ?: ""
+            )
+
+            nameEt.setText(user.name)
+            ageEt.setText(user.age.toString())
+            emailAddressEt.setText(user.email_address)
+        }
 
         binding.updateProfileBtn.setOnClickListener {
 

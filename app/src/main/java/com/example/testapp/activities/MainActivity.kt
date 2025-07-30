@@ -31,15 +31,7 @@ private const val PROFILE_UPDATE_REQUEST_CODE = 1001
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding  // Binding declaration
     private lateinit var db: AppDatabase
-    var userId = 0
-    var user: User = User(
-        id = 0,
-        name = "",
-        age = 0,
-        token = "",
-        email_address = "",
-        password = ""
-    )
+    private lateinit var user: User
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,8 +62,6 @@ class MainActivity : AppCompatActivity() {
                 user = userDao.getUserByToken(SessionManager.token.toString())!!
                 if (user != null){
                     binding.greetingsTv.text = "Hi ${user?.email_address}"
-                    userId = user.id.toInt()
-
                     if(user.age == 0 || user.name.isEmpty()){
 
                         //Incomplete profile dialog
@@ -85,9 +75,6 @@ class MainActivity : AppCompatActivity() {
                             {
                                 val intent = Intent(this@MainActivity, ProfileActivity::class.java)
                                 intent.putExtra("user_id", user.id.toString())
-                                intent.putExtra("name", user.name)
-                                intent.putExtra("age", user.age.toString())
-                                intent.putExtra("email_address", user.email_address)
                                 startActivityForResult(intent, PROFILE_UPDATE_REQUEST_CODE)
                             }
                         )
@@ -98,10 +85,7 @@ class MainActivity : AppCompatActivity() {
                     //bundle for Profile
                     var menuFragment = MenuItemFragment()
                     var menuBundle = Bundle()
-                    menuBundle.putString("user_id", userId.toString())
-                    menuBundle.putString("name", user.name)
-                    menuBundle.putString("age", user.age.toString())
-                    menuBundle.putString("email_address", user.email_address)
+                    menuBundle.putString("user_id", user.id.toString())
                     menuFragment.arguments = menuBundle
                     supportFragmentManager.beginTransaction()
                         .replace(R.id.menu_ll, menuFragment)
